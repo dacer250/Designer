@@ -349,40 +349,40 @@
         }).prev('.ui-dialog-titlebar').find('a').hide();
         
         <%-- Manage session timeout. Open a dialog box 2 minutes before timeout, this runs every 30 mins --%>
-        setInterval(function() {
-            var lastAccessedTimeInSession = $.cookie('lastAccessedTime');
-            var currentDate = new Date();
-            //var curentTimeInUTC = currentDate.getTime() + (currentDate.getTimezoneOffset() * 60000);
-            var curentTime = currentDate.getTime();
-            var theTime = parseInt((lastAccessedTimeInSession - curentTime)/60000);
-            console.log(theTime + " " + lastAccessedTimeInSession + " " + curentTime);
-            if ( theTime < 0 && !$("#sessionTimeoutDialog").dialog( "isOpen" ) ){
-                var ocURL = "${sessionScope['scopedTarget.userPreferences'].exitURL}";
-                $('#counter').html("Your session has expired.")
-                $('#sessionTimeoutDialog').dialog( "option", "buttons", { "Go back to OpenClinica": function() { window.location = ocURL; } } );
-                $("#sessionTimeoutDialog").dialog("open");
-            }
-            if ( theTime == 2 && !$("#sessionTimeoutDialog").dialog( "isOpen" ) ){
-                var ocURL = "${sessionScope['scopedTarget.userPreferences'].appURL}";
-                $('#counter').countdown('destroy');
-                $('#counter').countdown({until: '+0h +2m +00s', format: 'YOWDHMS', significant: 2, layout: '{mnn}{sep}{snn}',
-                    onExpiry: function(){
-                        //console.log(ocURL)
-                        $('#counter').countdown('destroy');
-                        $('#counter').html("Your session has expired.")
-                        $('#sessionTimeoutDialog').dialog( "option", "buttons", { "Go back to OpenClinica": function() { window.location = ocURL; } } );
-                    }
-                    });
-                $('#sessionTimeoutDialog').dialog( 
-                        "option", 
-                        "buttons", 
-                        { "Reset": function() {
-                            $.getJSON('access/refreshSession');
-                            $(this).dialog("close"); 
-                            }});
-                $("#sessionTimeoutDialog").dialog("open");
-            }
-        }, 60000);
+        <%--setInterval(function() {--%>
+        <%--    var lastAccessedTimeInSession = $.cookie('lastAccessedTime');--%>
+        <%--    var currentDate = new Date();--%>
+        <%--    //var curentTimeInUTC = currentDate.getTime() + (currentDate.getTimezoneOffset() * 60000);--%>
+        <%--    var curentTime = currentDate.getTime();--%>
+        <%--    var theTime = parseInt((lastAccessedTimeInSession - curentTime)/60000);--%>
+        <%--    console.log(theTime + " " + lastAccessedTimeInSession + " " + curentTime);--%>
+        <%--    if ( theTime < 0 && !$("#sessionTimeoutDialog").dialog( "isOpen" ) ){--%>
+        <%--        var ocURL = "${sessionScope['scopedTarget.userPreferences'].exitURL}";--%>
+        <%--        $('#counter').html("Your session has expired.")--%>
+        <%--        $('#sessionTimeoutDialog').dialog( "option", "buttons", { "Go back to OpenClinica": function() { window.location = ocURL; } } );--%>
+        <%--        $("#sessionTimeoutDialog").dialog("open");--%>
+        <%--    }--%>
+        <%--    if ( theTime == 2 && !$("#sessionTimeoutDialog").dialog( "isOpen" ) ){--%>
+        <%--        var ocURL = "${sessionScope['scopedTarget.userPreferences'].appURL}";--%>
+        <%--        $('#counter').countdown('destroy');--%>
+        <%--        $('#counter').countdown({until: '+0h +2m +00s', format: 'YOWDHMS', significant: 2, layout: '{mnn}{sep}{snn}',--%>
+        <%--            onExpiry: function(){--%>
+        <%--                //console.log(ocURL)--%>
+        <%--                $('#counter').countdown('destroy');--%>
+        <%--                $('#counter').html("Your session has expired.")--%>
+        <%--                $('#sessionTimeoutDialog').dialog( "option", "buttons", { "Go back to OpenClinica": function() { window.location = ocURL; } } );--%>
+        <%--            }--%>
+        <%--            });--%>
+        <%--        $('#sessionTimeoutDialog').dialog( --%>
+        <%--                "option", --%>
+        <%--                "buttons", --%>
+        <%--                { "Reset": function() {--%>
+        <%--                    $.getJSON('access/refreshSession');--%>
+        <%--                    $(this).dialog("close"); --%>
+        <%--                    }});--%>
+        <%--        $("#sessionTimeoutDialog").dialog("open");--%>
+        <%--    }--%>
+        <%--}, 60000);--%>
 
 
         

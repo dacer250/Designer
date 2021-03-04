@@ -2,8 +2,11 @@ package org.akaza.openclinica.designer.web.controller;
 
 import org.springframework.security.oauth2.consumer.OAuth2RestTemplate;
 import org.springframework.security.oauth2.consumer.webserver.WebServerProfileResourceDetails;
+import org.springframework.web.client.RestTemplate;
 
-public class UserPreferences {
+import java.io.Serializable;
+
+public class UserPreferences implements Serializable {
 
     private String host;
     private String appName;
@@ -14,6 +17,16 @@ public class UserPreferences {
     private OAuth2RestTemplate restTemplate;
     private Boolean initialized;
     private Boolean editMode;
+
+    private RestTemplate httpClient =new RestTemplate();
+
+    public RestTemplate getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(RestTemplate httpClient) {
+        this.httpClient = httpClient;
+    }
 
     // To access this variable in jsp use ${sessionScope['scopedTarget.userPreferences'].host}
 
@@ -152,4 +165,18 @@ public class UserPreferences {
         return getAppURL() + "ViewRuleAssignment?designer=true";
     }
 
+    @Override
+    public String toString() {
+        return "UserPreferences{" +
+                "host='" + host + '\'' +
+                ", appName='" + appName + '\'' +
+                ", path='" + path + '\'' +
+                ", user='" + user + '\'' +
+                ", studyOid='" + studyOid + '\'' +
+                ", oauthResource=" + oauthResource +
+                ", restTemplate=" + restTemplate +
+                ", initialized=" + initialized +
+                ", editMode=" + editMode +
+                '}';
+    }
 }

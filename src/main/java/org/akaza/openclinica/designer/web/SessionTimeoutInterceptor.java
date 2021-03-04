@@ -18,7 +18,7 @@ public class SessionTimeoutInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException {
-        long sessionWillTimeoutIn = request.getSession().getLastAccessedTime() + (request.getSession().getMaxInactiveInterval() * 1000);
+        long sessionWillTimeoutIn = request.getSession().getLastAccessedTime() + (request.getSession().getMaxInactiveInterval() * 1000000);
         cookieGenerator.addCookie(response, String.valueOf(sessionWillTimeoutIn));
         return true;
     }

@@ -92,6 +92,7 @@ public class AccessResourceController {
             session.setAttribute(SESSION_ATTR_FORM, uiODMBuilder.getContainer().getRuleCommandByRuleOidAndTarget(ruleOid, target, runTime, message));
             userPreferences.turnOnEditMode();
         }
+        System.out.println(userPreferences.toString());
         // doRest();
         return "ruleBuilder";
     }
@@ -139,8 +140,9 @@ public class AccessResourceController {
     private ODM getMetadata() {
         ODM odm = null;
         String uri = userPreferences.getMetadataURL();
-        InputStream studyMetadataXML = new ByteArrayInputStream(userPreferences.getRestTemplate().getForObject(URI.create(uri), byte[].class));
-
+        System.out.println(uri);
+      //  InputStream studyMetadataXML = new ByteArrayInputStream(userPreferences.getRestTemplate().getForObject(URI.create(uri), byte[].class));
+        InputStream studyMetadataXML = new ByteArrayInputStream(userPreferences.getHttpClient().getForObject(URI.create(uri),byte[].class));
         try {
             InputStreamReader isr = new InputStreamReader(studyMetadataXML, "UTF-8");
             odm = (ODM) this.unMarshaller.unmarshal(new StreamSource(isr));
@@ -163,8 +165,11 @@ public class AccessResourceController {
             if (studyMetadataXML != null) {
                 // DO THIS PROPERLY !!!!!
                 // studyMetadataXML.close();
+
             }
         }
+
+
         return odm;
     }
 

@@ -359,6 +359,7 @@ public class TreeController {
     public @ResponseBody
     List<TreeModel> getCrfsNewOid(@RequestParam String name, HttpSession session) throws IOException {
 
+        logger.info("crfListNewOid:name={}",name);
         UIODMContainer uiODMContainer = (UIODMContainer) session.getAttribute("uiODMContainer");
         List<TreeModel> crfs = new ArrayList<TreeModel>();
 

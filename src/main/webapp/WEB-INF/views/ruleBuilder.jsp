@@ -308,9 +308,9 @@
             <!--  <span id="tabs2"></span> USE THIS IF NO TABS INVOLVED-->
             <div id="tabs2">
                 <ul>
-                    <li><a href="<c:url value="/ruleBuilder/ruleBuilderFormA" />">Designer</a></li>
-                    <li><a href="<c:url value="/ruleBuilder/xmlForm" />">XML</a></li>
-                    <li><a href="<c:url value="/ruleBuilder/testForm" />">Test</a></li>
+<%--                    <li><a href="<c:url value="/ruleBuilder/ruleBuilderFormA" />">Designer</a></li>--%>
+<%--                    <li><a href="<c:url value="/ruleBuilder/xmlForm" />">XML</a></li>--%>
+<%--                    <li><a href="<c:url value="/ruleBuilder/testForm" />">Test</a></li>--%>
                 </ul>
             </div> 
         </div>
