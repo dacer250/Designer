@@ -439,6 +439,10 @@
             ajaxOptions: {
                 cache: false,
                 error: function( xhr, status, index, anchor ) {
+                    console.log(xhr)
+                    console.log(status)
+                    console.log(index)
+                    console.log(anchor)
                     alert("Couldn't load this tab. We'll try to fix this as soon as possible.");
                 }
             }

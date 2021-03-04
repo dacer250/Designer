@@ -5,10 +5,7 @@ import org.akaza.openclinica.designer.web.controller.FlashMap.MessageType;
 import org.akaza.openclinica.designer.web.fields.InputField;
 import org.openclinica.ns.response.v31.MessagesType;
 import org.openclinica.ns.response.v31.Response;
-import org.openclinica.ns.rules.v31.RuleAssignmentType;
-import org.openclinica.ns.rules.v31.RuleDefType;
-import org.openclinica.ns.rules.v31.RuleImportType;
-import org.openclinica.ns.rules.v31.Rules;
+import org.openclinica.ns.rules.v31.*;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTest;
 import org.slf4j.Logger;
@@ -136,7 +133,7 @@ public class RuleBuilderController {
             return messages;
         }
 
-        messages = validateRule(uiODMContainer, rulesCommandToRules(form), new DefaultResponseHandler());
+        messages = validateRule(uiODMContainer, rulesCommandToRuleImportType(form), new DefaultResponseHandler());
 
         session.setAttribute(SESSION_ATTR_FORM, form);
 
@@ -193,7 +190,7 @@ public class RuleBuilderController {
             return null;
         }
 
-        messages = validateRule(uiODMContainer, rulesCommandToRules(form), new DefaultResponseHandler(VALID_RULE_MESSAGE));
+        messages = validateRule(uiODMContainer, rulesCommandToRuleImportType(form), new DefaultResponseHandler(VALID_RULE_MESSAGE));
 
         session.setAttribute(SESSION_ATTR_FORM, form);
         // success response handling
@@ -286,7 +283,7 @@ public class RuleBuilderController {
         UIODMContainer uiODMContainer = (UIODMContainer) session.getAttribute(SESSION_ATTR_UIODMCONTAINER);
         ArrayList<Message> messages = new ArrayList<Message>();
 
-        Rules r = null;
+        RuleImportType r = null;
         try {
             r = loadRulesFromString(form.getXml());
         } catch (UnMarshallingException e) {
@@ -322,7 +319,7 @@ public class RuleBuilderController {
         ArrayList<Message> messages = new ArrayList<Message>();
         UIODMContainer uiODMContainer = (UIODMContainer) session.getAttribute(SESSION_ATTR_UIODMCONTAINER);
 
-        Rules r = null;
+        RuleImportType r = null;
         try {
             r = loadRulesFromString(form.getXml());
         } catch (UnMarshallingException e) {
@@ -360,7 +357,7 @@ public class RuleBuilderController {
         ArrayList<Message> messages = new ArrayList<Message>();
         UIODMContainer uiODMContainer = (UIODMContainer) session.getAttribute(SESSION_ATTR_UIODMCONTAINER);
 
-        Rules r = null;
+        RuleImportType  r = null;
         try {
             r = loadRulesFromString(form.getXml());
         } catch (UnMarshallingException e) {
@@ -369,6 +366,7 @@ public class RuleBuilderController {
             model.addAttribute("ajaxRequest", isAjaxRequest(requestedWith));
             return messages;
         }
+
 
         messages = validateRule(uiODMContainer, r, new DefaultResponseHandler());
 
@@ -401,7 +399,7 @@ public class RuleBuilderController {
             return messages;
         }
         
-        Rules r = null;
+        RuleImportType r = null;
         try {
             r = loadRulesFromString(form.getXml());
             form.setTarget(r.getRuleAssignment().get(0).getTarget());
@@ -523,12 +521,12 @@ public class RuleBuilderController {
 
     }
 
-    private ArrayList<Message> callREST(UIODMContainer uiODMContainer, Rules rule, ResponseHandler responseHandler, String url) {
+    private ArrayList<Message> callREST(UIODMContainer uiODMContainer, Object rule, ResponseHandler responseHandler, String url) {
         ArrayList<Message> messages = new ArrayList<Message>();
-        Map<String, String> vars = Collections.singletonMap("study", uiODMContainer.getStudyOid());
+        Map<String, String> vars = Collections.singletonMap("study",userPreferences.getStudyOid());
         Response resp = null;
         try {
-            resp = userPreferences.getRestTemplate().postForObject(url, rule, Response.class, vars);   
+            resp = userPreferences.getHttpClient().postForObject(url, rule, Response.class, vars);
             if (resp.isValid()) {
                 messages.addAll(responseHandler.handle());
             } else {
@@ -546,11 +544,14 @@ public class RuleBuilderController {
         return messages;
     }
 
-    private ArrayList<Message> validateRule(UIODMContainer uiODMContainer, Rules rule, ResponseHandler responseHandler) {
+    private ArrayList<Message> validateRule(UIODMContainer uiODMContainer, RuleImportType rule, ResponseHandler responseHandler) {
+        userPreferences.setStudyOid("S_QMKL2019");
+        userPreferences.setHost("http://octest.sigma-stat.com:9001");
+        userPreferences.setAppName("OpenClinica");
         return callREST(uiODMContainer, rule, responseHandler, userPreferences.getValidateRuleURL());
     }
 
-    private ArrayList<Message> saveRule(UIODMContainer uiODMContainer, Rules rule, ResponseHandler responseHandler, Boolean ignoreDuplicates) {
+    private ArrayList<Message> saveRule(UIODMContainer uiODMContainer, Object rule, ResponseHandler responseHandler, Boolean ignoreDuplicates) {
         if (ignoreDuplicates)
             return callREST(uiODMContainer, rule, responseHandler, userPreferences.getValidateAndSaveOrUpdateRuleURL());
         else
@@ -581,6 +582,27 @@ public class RuleBuilderController {
         return r;
 
     }
+    private RuleImportType rulesCommandToRuleImportType(RulesCommand form) {
+        RulesCommand rc = new RulesCommand(form);
+        rc.getRuleRef().setOID(form.getRuleDef().getOID());
+        LazyRuleRefType2 lzRuleRef = new LazyRuleRefType2();
+        List<LazyRuleRefType2> listLzRuleRef = lzRuleRef.splitRuleRef(rc.getRuleRef());
+        RuleAssignmentType ra = new RuleAssignmentType();
+        form.getTarget().setValue(form.getTarget().getValue() == null ? "" : form.getTarget().getValue().trim());
+        ra.setTarget(form.getTargetCurated(form.getTarget()));
+        if (!form.getRunOnSchedule().getTime().equals(""))
+            ra.setRunOnSchedule(form.getRunOnSchedule());
+        RuleImportType r = new RuleImportType();
+        for (LazyRuleRefType2 lrr : listLzRuleRef) {
+            ra.getRuleRef().add(lrr);
+        }
+        r.getRuleAssignment().add(ra);
+        for(RuleDefType rdt : lzRuleRef.splitRuleDef(form.getRuleDefCurated(), listLzRuleRef.size())) {
+            r.getRuleDef().add(rdt);
+        }
+        return r;
+
+    }
 
     /**
      * Convert RulesCommand to RulesTest Object
@@ -603,13 +625,15 @@ public class RuleBuilderController {
     /**
      * Convert XML which is represented as a String to Rules Object
      */
-    private Rules loadRulesFromString(String rulesString) throws UnMarshallingException {
+    private RuleImportType loadRulesFromString(String rulesString) throws UnMarshallingException {
         StringReader reader = new StringReader(rulesString);
-        Rules rules = null;
+        RuleImportType rules = null;
         try {
+            //ok
             // rules = (Rules) this.unMarshaller.unmarshal(new StreamSource(reader));
-            JAXBElement<Rules> root = (JAXBElement<Rules>) this.unMarshaller.unmarshal(new StreamSource(reader));
-            rules = (Rules) root.getValue();
+            JAXBElement<RuleImportType> root = (JAXBElement<RuleImportType>) this.unMarshaller.unmarshal(new StreamSource(reader));
+             rules =(RuleImportType) root.getValue();
+            //rules = (Rules) root.getValue();
         } catch (FileNotFoundException e) {
             throw new UnMarshallingException();
             // TODO Auto-generated catch block
