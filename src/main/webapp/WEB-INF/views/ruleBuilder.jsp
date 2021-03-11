@@ -308,9 +308,9 @@
             <!--  <span id="tabs2"></span> USE THIS IF NO TABS INVOLVED-->
             <div id="tabs2">
                 <ul>
-<%--                    <li><a href="<c:url value="/ruleBuilder/ruleBuilderFormA" />">Designer</a></li>--%>
-<%--                    <li><a href="<c:url value="/ruleBuilder/xmlForm" />">XML</a></li>--%>
-<%--                    <li><a href="<c:url value="/ruleBuilder/testForm" />">Test</a></li>--%>
+                    <li><a href="<c:url value="/ruleBuilder/ruleBuilderFormA" />">Designer</a></li>
+                    <li><a href="<c:url value="/ruleBuilder/xmlForm" />">XML</a></li>
+                    <li><a href="<c:url value="/ruleBuilder/testForm" />">Test</a></li>
                 </ul>
             </div> 
         </div>
@@ -638,7 +638,9 @@ $(function () {
 
     </div>
 </div>
-
+$(function(){
+    $("#demo4").trigger('click');
+});
 <div class="ui-layout-east" style="display: none;">
     <h3 class="ui-widget-header">Help</h3>
 
