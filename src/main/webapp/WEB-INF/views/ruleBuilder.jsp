@@ -326,6 +326,101 @@
 
     <div id="accordion1" class="basic">
 
+        <h3><a href="#"><fmt:message key="label_view_by_event"/> </a></h3>
+        <div style="padding-left:6px; padding-top:0px">
+            <div id="demo4" class="demo"></div>
+            <script type="text/javascript" class="source">
+                $(function () {
+                    $("#demo4").jstree({
+                        "dnd": {
+                            "drop_target": "#ocTextArea, input[name*='lazyProperties'], input[name*='lazyEventActions']",
+                            "drop_finish": function (data) {
+                                alert("test");
+                                var ctrl = data.r[0],
+                                    pos = 0,
+                                    sel;
+                                if (document.selection) {
+                                    //ctrl.focus();
+                                    //sel = document.selection.createRange();
+                                    //sel.moveStart('character', -ctrl.value.length);
+                                    //pos = sel.text.length;
+                                    ctrl.focus();
+
+                                    var r = document.selection.createRange();
+                                    if (r == null) {
+                                        return 0;
+                                    }
+
+                                    var re = ctrl.createTextRange(),
+                                        rc = re.duplicate();
+                                    re.moveToBookmark(r.getBookmark());
+                                    rc.setEndPoint('EndToStart', re);
+
+                                    pos = rc.text.length;
+                                } else if (ctrl.selectionStart || ctrl.selectionStart == '0') {
+                                    pos = ctrl.selectionStart;
+                                }
+                                ctrl.value = ctrl.value.slice(0, pos) + " " + data.o.attr("oid") + " " + ctrl.value.slice(pos);
+                            },
+                            "drag_check": function (data) {
+                                if (data.r.attr("id") == "phtml_1") {
+                                    return false;
+                                }
+                                return {
+                                    after: false,
+                                    before: false,
+                                    inside: false
+                                };
+                            },
+                            "drag_finish": function () {
+                                alert("DRAG OK");
+                            }
+                        },
+                        "themes": {
+                            "theme": "classic",
+                            "dots": true,
+                            "icons": true
+                        },
+                        "json_data": {
+                            "ajax": {
+                                "url": function (node) {
+                                    if ($('input[name=toggleTreeViewBetweenOidOrName]:checked').val() == 'oid') {
+                                        if (node == "-1") return 'tree/eventsListOid';
+                                        if (node.attr("ocType") == "event") return 'tree/eventCrfsListOid';
+                                        if (node.attr("ocType") == "crf") return 'tree/eventCrfGroupsAndItemsListOid';
+                                        if (node.attr("ocType") == "itemGroup") return 'tree/eventCrfGroupItemsListOid';
+                                    } else {
+                                        if (node == "-1") return 'tree/eventsList';
+                                        if (node.attr("ocType") == "event") return 'tree/eventCrfsList';
+                                        if (node.attr("ocType") == "crf") return 'tree/eventCrfGroupsAndItemsList';
+                                        if (node.attr("ocType") == "itemGroup") return 'tree/eventCrfGroupItemsList';
+                                    }
+                                },
+                                "data": function (n) {
+                                    if (n == "-1") return {
+                                        name: '0'
+                                    };
+                                    if (n.attr("ocType") == "event") return {
+                                        eventOid: n.attr("oid")
+                                    };
+                                    if (n.attr("ocType") == "crf") return {
+                                        crfOid: n.attr("oid"),
+                                        eventOid: n.attr("eventOid")
+                                    };
+                                    if (n.attr("ocType") == "itemGroup") return {
+                                        itemGroupOid: n.attr("oid"),
+                                        crfOid: n.attr("crfOid"),
+                                        eventOid: n.attr("eventOid")
+                                    };
+                                }
+                            }
+                        },
+                        "plugins": ["themes", "json_data"]
+                    });
+                });
+            </script>
+        </div>
+
 <h3>
                 <a href="#"><fmt:message key="label_view_by_crf"/> </a>
                 <!--<input type="button" style="clear: both;" id="toggle_node" value="toggle_node" class="button"> -->
@@ -530,100 +625,7 @@ $(function () {
             </div>
 
              
-            <h3><a href="#"><fmt:message key="label_view_by_event"/> </a></h3>
-            <div style="padding-left:6px; padding-top:0px">
-                <div id="demo4" class="demo"></div>
-<script type="text/javascript" class="source">
-$(function () {
-    $("#demo4").jstree({
-        "dnd": {
-           "drop_target": "#ocTextArea, input[name*='lazyProperties'], input[name*='lazyEventActions']",
-           "drop_finish": function (data) {
-               alert("test");
-               var ctrl = data.r[0],
-                   pos = 0,
-                   sel;
-               if (document.selection) {
-                   //ctrl.focus();
-                   //sel = document.selection.createRange();
-                   //sel.moveStart('character', -ctrl.value.length);
-                   //pos = sel.text.length;
-                   ctrl.focus();
 
-                   var r = document.selection.createRange();
-                   if (r == null) {
-                       return 0;
-                   }
-
-                   var re = ctrl.createTextRange(),
-                       rc = re.duplicate();
-                   re.moveToBookmark(r.getBookmark());
-                   rc.setEndPoint('EndToStart', re);
-
-                   pos = rc.text.length;
-               } else if (ctrl.selectionStart || ctrl.selectionStart == '0') {
-                   pos = ctrl.selectionStart;
-               }
-               ctrl.value = ctrl.value.slice(0, pos) + " " + data.o.attr("oid") + " " + ctrl.value.slice(pos);
-           },
-           "drag_check": function (data) {
-               if (data.r.attr("id") == "phtml_1") {
-                   return false;
-               }
-               return {
-                   after: false,
-                   before: false,
-                   inside: false
-               };
-           },
-           "drag_finish": function () {
-               alert("DRAG OK");
-           }
-       },
-        "themes": {
-            "theme": "classic",
-            "dots": true,
-            "icons": true
-        },
-        "json_data": {
-            "ajax": {
-                "url": function (node) {
-                    if ($('input[name=toggleTreeViewBetweenOidOrName]:checked').val() == 'oid') {
-                        if (node == "-1") return 'tree/eventsListOid';
-                        if (node.attr("ocType") == "event") return 'tree/eventCrfsListOid';
-                        if (node.attr("ocType") == "crf") return 'tree/eventCrfGroupsAndItemsListOid';
-                        if (node.attr("ocType") == "itemGroup") return 'tree/eventCrfGroupItemsListOid';
-                    } else {
-                        if (node == "-1") return 'tree/eventsList';
-                        if (node.attr("ocType") == "event") return 'tree/eventCrfsList';
-                        if (node.attr("ocType") == "crf") return 'tree/eventCrfGroupsAndItemsList';
-                        if (node.attr("ocType") == "itemGroup") return 'tree/eventCrfGroupItemsList';
-                    }
-                },
-                "data": function (n) {
-                    if (n == "-1") return {
-                        name: '0'
-                    };
-                    if (n.attr("ocType") == "event") return {
-                        eventOid: n.attr("oid")
-                    };
-                    if (n.attr("ocType") == "crf") return {
-                        crfOid: n.attr("oid"),
-                        eventOid: n.attr("eventOid")
-                    };
-                    if (n.attr("ocType") == "itemGroup") return {
-                        itemGroupOid: n.attr("oid"),
-                        crfOid: n.attr("crfOid"),
-                        eventOid: n.attr("eventOid")
-                    };
-                }
-            }
-        },
-        "plugins": ["themes", "json_data"]
-    });
-});
-</script>
-            </div>
 
             <h3><a href="#">Section 4</a></h3>
 
@@ -638,9 +640,11 @@ $(function () {
 
     </div>
 </div>
+<script>
 $(function(){
-    $("#demo4").trigger('click');
+    $("#demo4").attr('aria-expanded','true');
 });
+</script>
 <div class="ui-layout-east" style="display: none;">
     <h3 class="ui-widget-header">Help</h3>
 

@@ -18,10 +18,12 @@ public class TestRulesGetResponseHandler implements TestRulesResponseHandler {
         for (ParameterType parameterType : response.getParameters()) {
             if (!parameterType.getKey().equals("result") && !parameterType.getKey().equals("ruleEvaluatesTo")
                 && !parameterType.getKey().equals("ruleValidation")) {
-                UIEntityDetail itemDetail = uiODMBuilder.buildItemDetail(parameterType.getKey());
+                String key =parameterType.getKey();
+                String lastOid =key.contains(".")? key.substring(key.lastIndexOf(".")+".".length()):key;
+                UIEntityDetail itemDetail = uiODMBuilder.buildItemDetail(lastOid);
                 if (itemDetail.getClass() == UIItemDetail.class) {
-                    form.getRuleProperties().put(parameterType.getKey(), parameterType.getValue());
-                    inputFields.add(InputFieldFactory.createInputField("ruleProperties['" + parameterType.getKey() + "']", parameterType.getKey(), itemDetail));
+                    form.getRuleProperties().put(key, parameterType.getValue());
+                    inputFields.add(InputFieldFactory.createInputField("ruleProperties['" + key + "']", key, itemDetail));
                 } else {
                     // parameterType.getKey() == SE_REGISTRATIONVISIT.STARTDATE
                     String[] oidSplitter = parameterType.getKey().split("\\.");

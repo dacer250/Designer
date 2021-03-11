@@ -443,7 +443,7 @@
                     console.log(status)
                     console.log(index)
                     console.log(anchor)
-                    alert("Couldn't load this tab. We'll try to fix this as soon as possible.");
+                    alert("联系管理员.");
                 }
             }
         });
