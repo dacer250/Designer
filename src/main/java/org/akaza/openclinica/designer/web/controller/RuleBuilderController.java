@@ -10,6 +10,7 @@ import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -511,8 +512,7 @@ public class RuleBuilderController {
         ArrayList<Message> messages = new ArrayList<Message>();
         RulesTest resp = null;
         try {
-            resp =
-                userPreferences.getRestTemplate().postForObject(userPreferences.getValidateAndTestRuleURL(), createRulesTestFromCommand(form), RulesTest.class);
+            resp =userPreferences.getHttpClient().postForObject(userPreferences.getValidateAndTestRuleURL(), createRulesTestFromCommand(form), RulesTest.class);
             responseHandler.handle(form, resp, uiODMBuilder);
             return;
         } catch (Exception e) {
@@ -569,7 +569,7 @@ public class RuleBuilderController {
         RuleAssignmentType ra = new RuleAssignmentType();
         form.getTarget().setValue(form.getTarget().getValue() == null ? "" : form.getTarget().getValue().trim());
         ra.setTarget(form.getTargetCurated(form.getTarget()));
-        if (!form.getRunOnSchedule().getTime().equals("")) 
+        if (form.getRunOnSchedule()!=null &&!form.getRunOnSchedule().getTime().equals(""))
             ra.setRunOnSchedule(form.getRunOnSchedule());
         Rules r = new Rules();
         for (LazyRuleRefType2 lrr : listLzRuleRef) {
@@ -594,11 +594,22 @@ public class RuleBuilderController {
             ra.setRunOnSchedule(form.getRunOnSchedule());
         RuleImportType r = new RuleImportType();
         for (LazyRuleRefType2 lrr : listLzRuleRef) {
-            ra.getRuleRef().add(lrr);
+            RuleRefType v1 =new RuleRefType();
+            v1.getEmailAction().addAll(lrr.getEmailAction());
+            v1.getNotificationAction().addAll(lrr.getNotificationAction());
+            v1.getEventAction().addAll(lrr.getEventAction());
+            v1.getHideAction().addAll(lrr.getHideAction());
+            v1.getInsertAction().addAll(lrr.getInsertAction());
+            v1.getDiscrepancyNoteAction().addAll(lrr.getDiscrepancyNoteAction());
+            v1.getShowAction().addAll(lrr.getShowAction());
+            v1.setOID(lrr.getOID());
+            ra.getRuleRef().add(v1);
+
         }
         r.getRuleAssignment().add(ra);
         for(RuleDefType rdt : lzRuleRef.splitRuleDef(form.getRuleDefCurated(), listLzRuleRef.size())) {
             r.getRuleDef().add(rdt);
+
         }
         return r;
 
