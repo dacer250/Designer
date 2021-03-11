@@ -545,9 +545,9 @@ public class RuleBuilderController {
     }
 
     private ArrayList<Message> validateRule(UIODMContainer uiODMContainer, RuleImportType rule, ResponseHandler responseHandler) {
-        userPreferences.setStudyOid("S_QMKL2019");
-        userPreferences.setHost("http://octest.sigma-stat.com:9001");
-        userPreferences.setAppName("OpenClinica");
+       // userPreferences.setStudyOid("S_QMKL2019");
+       // userPreferences.setHost("http://octest.sigma-stat.com:9001");
+       // userPreferences.setAppName("OpenClinica");
         return callREST(uiODMContainer, rule, responseHandler, userPreferences.getValidateRuleURL());
     }
 
